@@ -3,14 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistrationRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login() {
-        
+    public function login(LoginRequest $request) {
+        $token = auth()->attempt($request->validated());
+        if ($token) {
+            return $this->getAccessToken($token, auth()->user());   
+        } else {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'Invalid User' 
+            ], 401);
+        }
     }
 
     /**
@@ -20,7 +30,7 @@ class AuthController extends Controller
         /* Login to create a user record*/
         return response()->json([
             'status' => 'success',
-            'type' => 'bearer',
+            'type' => 'Bearer',
             'user' => $user,
             'access_token' => $token
         ]);
@@ -33,9 +43,13 @@ class AuthController extends Controller
      * 
     */
     public function register(RegistrationRequest $request) {
-        /* Login to create a user record*/
-        $user = User::create($request->validated());
 
+        $data = $request->validated();
+        $data['password'] = Hash::make($data['password']);
+
+        /* Login to create a user record*/
+        $user = User::create($data);
+        
         /*Check if the user was created*/
         if ($user) {
             $token = auth()->login($user);   
