@@ -15,14 +15,12 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * The attributes that are mass assignable.
+     * If its empty than all the fields are considered to be inserted
+     * If any columns are mentioned in [], then that specific field is not allowed to be inserted
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
