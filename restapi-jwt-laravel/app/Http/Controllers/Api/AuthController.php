@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Customs\Services\EmailVerificationService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistrationRequest;
 use App\Models\User;
+use App\Notifications\EmailVerificationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function __construct(private EmailVerificationService $service)
+    {
+        //throw new \Exception('Not implemented');
+    }
+
     public function login(LoginRequest $request) {
         $token = auth()->attempt($request->validated());
         if ($token) {
@@ -49,9 +56,10 @@ class AuthController extends Controller
 
         /* Login to create a user record*/
         $user = User::create($data);
-        
         /*Check if the user was created*/
         if ($user) {
+            $this->service->sendVerificationLink($user);
+           
             $token = auth()->login($user);   
             return $this->getAccessToken($token, $user);         
         } else {
