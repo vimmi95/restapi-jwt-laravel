@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Customs\Services\EmailVerificationService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\VerifyEmailRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistrationRequest;
+use App\Http\Requests\ResendEmailVerificationLinkRequest;
 use App\Models\User;
 use App\Notifications\EmailVerificationNotification;
 use Illuminate\Http\Request;
@@ -69,4 +71,18 @@ class AuthController extends Controller
             ],500); 
         }
     }
+
+    /**
+     * Verify Email of the user
+     */
+    public function verifyUserEmail(VerifyEmailRequest $request) {
+        return $this->service->verifyEmail($request->email, $request->token);
+    }     
+
+    /**
+     * Resend a verification link 
+     */
+    public function resendEmailVerificationLink(ResendEmailVerificationLinkRequest $request) {
+        return $this->service->resendLink($request->email);
+    }  
 }
