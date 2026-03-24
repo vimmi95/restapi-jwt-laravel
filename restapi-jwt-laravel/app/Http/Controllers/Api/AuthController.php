@@ -11,14 +11,12 @@ use App\Http\Requests\ResendEmailVerificationLinkRequest;
 use App\Models\User;
 use App\Notifications\EmailVerificationNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function __construct(private EmailVerificationService $service)
-    {
-        //throw new \Exception('Not implemented');
-    }
+    public function __construct(private EmailVerificationService $service){}
 
     public function login(LoginRequest $request) {
         $token = auth()->attempt($request->validated());
@@ -84,5 +82,16 @@ class AuthController extends Controller
      */
     public function resendEmailVerificationLink(ResendEmailVerificationLinkRequest $request) {
         return $this->service->resendLink($request->email);
+    }  
+
+    /**
+     * Logout the user
+     */
+    public function logout() {
+        Auth::logout();
+        return response()->json([   
+            'status' => 'Success',
+            'message' => 'User logout successfully'
+        ]);
     }  
 }
