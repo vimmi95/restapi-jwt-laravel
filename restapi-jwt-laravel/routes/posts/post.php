@@ -10,4 +10,8 @@ Route::middleware(['auth'])->group(function () {
         'status' => 'Failed',
         'message' => 'Post not found',
     ], 404));
-});
+    Route::delete('/posts/{post}', [PostController::class, 'delete'])->missing(fn () => response()->json([
+        'status' => 'Failed',
+        'message' => 'Post not found',
+    ], 404));
+}); 

@@ -12,7 +12,7 @@ class PostController extends Controller
 {
     public function __construct(private PostService $post) {}
 
-    public function store(CreatePostRequest $request){
+    public function store(CreatePostRequest $request) {
         try {
             $validatedData = $request->validated();
             $post = $this->post->create($validatedData);
@@ -43,6 +43,27 @@ class PostController extends Controller
             return response()->json([
                 'status' => 'Failed',
                 'message' => 'Post update failed, please try again later',
+            ], 500);
+        }
+    }
+
+    public function delete(Post $post) {
+        try {
+            $deletePost = $this->post->deletePost($post);
+            if(!$deletePost) {
+                return response()->json([
+                    'status' => 'Failed',
+                    'message' => 'An error occured when deleting the record from the table',
+                ], 500);
+            }
+            return response()->json([
+                'status' => 'Success',
+                'message' => 'Post Deleted Successfully',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
